@@ -2,13 +2,14 @@
 
 {% block content %}
 <h1 style="text-align: center;">Today's Tasks</h1>
+<a href="/add_tasks" class="btn btn-primary">Add Task</a>
 {% for item in tasks %}
 <div style="border-color: red;">
-    <h2>{{ item.title }}</h2>
+    <h2>{{ item.title }} - {% if item.done %} Завершено! {% else %} В процессе выполнения {% endif %}</h2>
 </div>
 <div>
-    <a href="/jobs/{{ item.id }}" class="btn btn-warning">Edit Job</a>
-    <a href="/jobs_delete/{{ item.id }}" class="btn btn-danger">Delete Job</a>
+    <a href="/tasks/{{ item.id }}" class="btn btn-warning">Edit Task</a>
+    <a href="/tasks_delete/{{ item.id }}" class="btn btn-danger">Delete Task</a>
 </div>
 {% endfor %}
 {% endblock %}
