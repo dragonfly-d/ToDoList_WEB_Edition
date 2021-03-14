@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 style="text-align: center;">Today's Tasks</h1>
+{% for item in tasks %}
+<div style="border-color: red;">
+    <h2>{{ item.title }}</h2>
+</div>
+<div>
+    <a href="/jobs/{{ item.id }}" class="btn btn-warning">Edit Job</a>
+    <a href="/jobs_delete/{{ item.id }}" class="btn btn-danger">Delete Job</a>
+</div>
+{% endfor %}
+{% endblock %}
