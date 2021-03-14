@@ -68,6 +68,18 @@ def edit_tasks(task_id):
             
     return render_template('add_task.html', title='Editing a task', form=form)
 
+@app.route("/tasks_delete/<int:task_id>", methods=["GET", "POST"])
+def delete_task(task_id):
+    db_sess = db_session.create_session()
+    task = db_sess.query(Tasks).filter(Tasks.id == task_id).first()
+
+    if task:
+        db_sess.delete(task)
+        db_sess.commit()
+        return redirect("/tasks")
+    else:
+        abort(404)
+
 
 if __name__ == '__main__':
     main()
