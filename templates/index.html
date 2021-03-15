@@ -4,12 +4,14 @@
 <h1 style="text-align: center;">Today's Tasks</h1>
 <a href="/add_tasks" class="btn btn-primary">Add Task</a>
 {% for item in tasks %}
-<div style="border-color: red;">
-    <h2>{{ item.title }} - {% if item.done %} Завершено! {% else %} В процессе выполнения {% endif %}</h2>
-</div>
-<div>
-    <a href="/tasks/{{ item.id }}" class="btn btn-warning">Edit Task</a>
-    <a href="/tasks_delete/{{ item.id }}" class="btn btn-danger">Delete Task</a>
-</div>
+    <div style="margin: 10px;">
+        <h2>{{ item.title }} - {% if item.done %} Завершено! {% else %} В процессе выполнения {% endif %}</h2>
+        <h4>Task Priority:</br> {{ item.priority }}</h4>
+        <h4>Scheduled data:</br> {{ item.scheduled_date.strftime("%m/%d/%Y") }}</h4>
+    </div>
+    <div>
+        <a href="/tasks/{{ item.id }}" class="btn btn-warning">Edit Task</a>
+        <a href="/tasks_delete/{{ item.id }}" class="btn btn-danger">Delete Task</a>
+    </div>
 {% endfor %}
 {% endblock %}

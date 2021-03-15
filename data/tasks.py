@@ -21,5 +21,5 @@ class Tasks(SqlAlchemyBase):
                                 sqlalchemy.ForeignKey("users.id"))
     user = orm.relation('User')
     priority = sqlalchemy.Column(sqlalchemy.Integer, default=4)
-    scheduled_date = sqlalchemy.Column(sqlalchemy.DateTime)
+    scheduled_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
 

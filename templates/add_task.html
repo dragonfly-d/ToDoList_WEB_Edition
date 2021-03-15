@@ -13,6 +13,24 @@
             </p>
         {% endfor %}
     </p>
+    <p>
+        {{ form.priority.label }}<br>
+        {{ form.priority(class="form-control") }}<br>
+        {% for error in form.priority.errors %}
+            <p class="alert alert-danger" role="alert">
+                {{ error }}
+            </p>
+        {% endfor %}
+    </p>
+    <p>
+        {{ form.scheduled_date.label }}<br>
+        {{ form.scheduled_date(class="form-control") }}<br>
+        {% for error in form.scheduled_date.errors %}
+            <p class="alert alert-danger" role="alert">
+                {{ error }}
+            </p>
+        {% endfor %}
+    </p>
     <p>{{ form.done() }} {{ form.done.label }}</p>
     <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
 </form>

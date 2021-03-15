@@ -33,6 +33,8 @@ def add_tasks():
         tasks = Tasks()
 
         tasks.title = form.title.data
+        tasks.priority = form.priority.data
+        tasks.scheduled_date = form.scheduled_date.data
         tasks.done = form.done.data
         tasks.user_id = "" # Изменить после добавления функционала с пользователями
         db_sess.add(tasks)
@@ -50,6 +52,8 @@ def edit_tasks(task_id):
 
         if tasks:
             form.title.data = tasks.title
+            form.priority.data = tasks.priority
+            form.scheduled_date.data = tasks.scheduled_date
             form.done.data = tasks.done
         else:
             abort(404)
@@ -60,6 +64,8 @@ def edit_tasks(task_id):
 
         if tasks:
             tasks.title = form.title.data
+            tasks.priority = form.priority.data
+            tasks.scheduled_date = form.scheduled_date.data
             tasks.done = form.done.data
             db_sess.commit()
             return redirect("/tasks")
