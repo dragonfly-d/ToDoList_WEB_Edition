@@ -21,6 +21,11 @@ def load_user(user_id):
     db_sess = db_session.create_session()
     return db_sess.query(User).get(user_id)
 
+# Обработчик ошибки 404
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
 def main():
     db_session.global_init("db/TDLDataBase.db")
     app.run(port=8080, host='127.0.0.1', debug=True)
@@ -116,7 +121,7 @@ def edit_tasks(task_id):
     # Если пользователь получает данные, то заполням форму текующими данными о задаче
     if request.method == "GET":
         db_sess = db_session.create_session()
-        tasks = db_sess.query(Tasks).filter(Tasks.id == task_id).first()
+        tasks = db_sess.query(Tasks).filter(Tasks.id == task_id, Tasks.user_id == current_user.id).first()
 
         if tasks:
             form.title.data = tasks.title
@@ -147,7 +152,7 @@ def edit_tasks(task_id):
 @login_required
 def delete_task(task_id):
     db_sess = db_session.create_session()
-    task = db_sess.query(Tasks).filter(Tasks.id == task_id).first()
+    task = db_sess.query(Tasks).filter(Tasks.id == task_id, Tasks.user_id == current_user.id).first()
 
     if task:
         db_sess.delete(task)
