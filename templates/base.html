@@ -8,6 +8,11 @@
     <title>{{ title }}</title>
 </head>
 <body>
+    {% if current_user.is_authenticated %}
+        <p>
+            <a class="navbar-brand" href="/logout">{{ current_user.name }}</a>
+        </p>
+    {% endif %}
     {% block content %}
     {% endblock %}
 </body>
