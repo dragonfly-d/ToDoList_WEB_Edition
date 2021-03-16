@@ -1,11 +1,14 @@
 from flask import Flask, render_template, redirect,  url_for, request, abort, jsonify, make_response, Markup
 from flask_login import LoginManager, current_user, login_user, logout_user, login_required
+from datetime import datetime
 from data import db_session
 from data.users import User
 from data.tasks import Tasks
 from forms.tasks import TasksForm
 from forms.login import LoginForm
 from forms.register import RegisterForm
+import pandas
+from itertools import groupby
 
 
 app = Flask(__name__)
@@ -37,6 +40,8 @@ def main():
 
 @app.route('/')
 def index():
+    if current_user.is_authenticated:
+        return redirect("/tasks/today")
     return render_template("main.html", title="Welcome!")
 
 @app.route("/login", methods=["GET", "POST"])
@@ -50,7 +55,7 @@ def login():
         # Проверяем если пользователь зарегистрирован в базе данных и пароли совпадают
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
-            return redirect("/tasks")
+            return redirect("/tasks/today")
         return render_template('login.html',
                                message="Incorrect email or password",
                                form=form)
@@ -85,13 +90,29 @@ def logout():
     logout_user()
     return redirect("/")
 
-@app.route("/tasks", methods=["GET"])
+@app.route("/tasks/today", methods=["GET"])
 @login_required
 def tasks():
     db_sess = db_session.create_session()
-    tasks = db_sess.query(Tasks).filter(Tasks.user_id == current_user.id).all() # Выводим только задачи, созданные этим пользователем
+    # Запрашиваем только задачи, созданные этим пользователем и дата которых совпадает с сегодняшним днем
+    today = datetime.strptime(f"{datetime.now().date()}", '%Y-%m-%d')
+    tasks = db_sess.query(Tasks).filter(Tasks.user_id == current_user.id, Tasks.scheduled_date == today).all()
 
     return render_template("index.html", title="Today's Tasks", tasks=tasks)
+
+@app.route("/tasks/upcoming", methods=["GET"])
+@login_required
+def upcoming_tasks():
+    db_sess = db_session.create_session()
+    # Запрашиваем все задачи, добавленный этим пользователем
+    tasks = db_sess.query(Tasks).filter(Tasks.user_id == current_user.id).all()
+    
+    # Группируем задачи по дате
+    data = {}
+    for key, group in groupby(tasks, lambda x: x.scheduled_date):
+        data[key] = [thing for thing in group]
+
+    return render_template("upcoming_tasks.html", title="Upcoming Tasks", tasks=data)
 
 @app.route('/add_tasks',  methods=['GET', 'POST'])
 @login_required
@@ -110,7 +131,7 @@ def add_tasks():
         tasks.user_id = current_user.id # Изменить после добавления функционала с пользователями
         db_sess.add(tasks)
         db_sess.commit()
-        return redirect('/tasks')
+        return redirect('/tasks/today')
     return render_template('add_task.html', title='Adding a task', form=form)
 
 @app.route('/tasks/<int:task_id>',  methods=['GET', 'POST'])
@@ -142,7 +163,7 @@ def edit_tasks(task_id):
             tasks.scheduled_date = form.scheduled_date.data
             tasks.done = form.done.data
             db_sess.commit()
-            return redirect("/tasks")
+            return redirect("/tasks/today")
         else:
             abort(404)
             
@@ -157,7 +178,7 @@ def delete_task(task_id):
     if task:
         db_sess.delete(task)
         db_sess.commit()
-        return redirect("/tasks")
+        return redirect("/tasks/today")
     else:
         abort(404)
 
