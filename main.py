@@ -97,7 +97,6 @@ def tasks():
     # Запрашиваем только задачи, созданные этим пользователем и дата которых совпадает с сегодняшним днем
     today = datetime.strptime(f"{datetime.now().date()}", '%Y-%m-%d')
     tasks = db_sess.query(Tasks).filter(Tasks.user_id == current_user.id, Tasks.scheduled_date == today).all()
-    tasks = sorted(tasks, key=lambda x: x.priority) # Сортируем задачи по приоритетности
 
     return render_template("index.html", title="Today's Tasks", tasks=tasks)
 
@@ -111,7 +110,7 @@ def upcoming_tasks():
     # Сортируем и группируем задачи по дате
     data = {}
     for key, group in groupby(sorted(tasks, key=lambda x: x.scheduled_date), key=lambda x: x.scheduled_date):
-        data[key] = sorted([thing for thing in group], key=lambda x: x.priority) # Сортируем задачи по приоритетности
+        data[key] = [thing for thing in group]
 
     return render_template("upcoming_tasks.html", title="Upcoming Tasks", tasks=data)
 
