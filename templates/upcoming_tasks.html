@@ -6,12 +6,10 @@
 <a href="/tasks/today" class="btn btn-primary">Today's Tasks</a>
 {% for key, val in tasks.items() %}
     <h1 style="text-align: center;">{{ key.strftime("%m/%d/%Y") }}</h1>
-
     {% for thing in val %}
         <div style="margin: 20px;">
             <h2>{{ thing.title }} - {% if thing.done %} Done! {% else %} In progress {% endif %}</h2>
             <h4>Task Priority:</br> {{ thing.priority }}</h4>
-            <h4>Scheduled date:</br> {{ thing.scheduled_date.strftime("%m/%d/%Y") }}</h4>
         </div>
         <div style="margin: 20px;">
             <a href="/tasks/{{ thing.id }}" class="btn btn-warning">Edit Task</a>

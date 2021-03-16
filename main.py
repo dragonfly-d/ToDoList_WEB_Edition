@@ -107,9 +107,9 @@ def upcoming_tasks():
     # Запрашиваем все задачи, добавленный этим пользователем
     tasks = db_sess.query(Tasks).filter(Tasks.user_id == current_user.id).all()
     
-    # Группируем задачи по дате
+    # Сортируем и группируем задачи по дате
     data = {}
-    for key, group in groupby(tasks, lambda x: x.scheduled_date):
+    for key, group in groupby(sorted(tasks, key=lambda x: x.scheduled_date), key=lambda x: x.scheduled_date):
         data[key] = [thing for thing in group]
 
     return render_template("upcoming_tasks.html", title="Upcoming Tasks", tasks=data)
