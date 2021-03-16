@@ -1,0 +1,19 @@
+a {
+    color: black;
+    text-decoration: none;
+}
+
+input {
+  width: 1000px;
+}
+
+.main_header {
+    display: flex;
+
+    padding: 3% 50%;
+    float: right;
+}
+
+.header_item {
+    margin: auto 10px;
+}
