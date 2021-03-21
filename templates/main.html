@@ -1,0 +1,33 @@
+{% extends "base.html" %} {% block content %}
+<main>
+    <div class="btn-group">
+        <a href="/Main/Today" class="btn btn-dark active" aria-current="page">Today tasks</a>
+        <a href="/Main/All" class="btn btn-dark">All tasks</a>
+    </div>
+    <button class="btn btn-dark" id="new_task">New task</button>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Title</th>
+                <th scope="col">Date</th>
+                <th scope="col">Done</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for task in tasks %}
+            <tr>
+                <th scope="row">{{ task.id }}</th>
+                <td>{{ task.title }}</td>
+                <td>{{ task.created_date }}</td>
+                {% if task.done == '1' %}
+                <td>Выполнено</td>
+                {% else %}
+                <td>Не выполнено</td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</main>
+{% endblock content %}

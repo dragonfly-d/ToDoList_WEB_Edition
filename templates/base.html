@@ -10,51 +10,80 @@
             crossorigin="anonymous"
         />
         <link rel="stylesheet" href="static/css/styles.css" />
-        <title>{{ title }}</title>
+        <title>Название страницы</title>
     </head>
     <body>
-        <header class="main_header">
-            <div class="header_item">
-                <input
-                    type="search"
-                    name="search"
-                    id="search"
-                    placeholder="Поиск заметки"
-                />
+        <header class="header">
+            <div class="header_nav">
+                <a class="header_logo" href="">ToDoList!</a>
             </div>
-            <div class="header_item">
-                <a class="user_login"> {{ user_name }} </a>
+
+            <input
+                type="search"
+                name="finder"
+                id="finder"
+                class="finder"
+                placeholder="Find task"
+            />
+
+            <div class="header_nav">
+                <a class="username">{{ user_name }}</a>
             </div>
         </header>
 
-        <main>
-            <div class="SideBar">
-                <div class="SideBar_section">
-                    <div class="SideBar_item">
-                        <a href="#">Главная</a>
-                    </div>
-                    <div class="SideBar_item">
-                        <a href="#">Мои заметки</a>
-                    </div>
-                    <div class="SideBar_item">
-                        <a href="#">Проекты</a>
-                    </div>
-                    <div class="SideBar_item">
-                        <a href="#">Календарь</a>
-                    </div>
-
-                    <div class="SideBar_section">
-                        <div class="SideBar_item">
-                            <a href="#">Настройки</a>
-                        </div>
-                        <div class="SideBar_item">
-                            <a href="#">Выход</a>
-                        </div>
-                    </div>
+        <div class="side_bar">
+            <div class="sidebar_section">
+                <div class="sidebar_item">
+                    <img
+                        src="static/img/icons/Main_page.png"
+                        alt=""
+                        class="icon"
+                    />
+                    <a href="/Main">Main page</a>
+                </div>
+                <div class="sidebar_item">
+                    <img
+                        src="static/img/icons/Statistics.png"
+                        alt=""
+                        class="icon"
+                    />
+                    <a href="/Statistics">Statistics</a>
+                </div>
+                <div class="sidebar_item">
+                    <img
+                        src="static/img/icons/Projects.png"
+                        alt=""
+                        class="icon"
+                    />
+                    <a href="/Projects">Projects</a>
                 </div>
             </div>
-        </main>
 
+            <div class="sidebar_section">
+                <div class="sidebar_item">
+                    <img
+                        src="static/img/icons/Settings.png"
+                        alt=""
+                        class="icon"
+                    />
+                    <a href="/Settings">Settings</a>
+                </div>
+                <div class="sidebar_item">
+                    <img
+                        src="static/img/icons/Logout.png"
+                        alt=""
+                        class="icon"
+                    />
+                    <a href="/Logout">Logout</a>
+                </div>
+            </div>
+        </div>
+
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0"
+            crossorigin="anonymous"
+        ></script>
         {% block content %} {% endblock %}
     </body>
 </html>
