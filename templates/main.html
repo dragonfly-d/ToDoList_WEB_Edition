@@ -20,7 +20,7 @@
                 <th scope="row">{{ task.id }}</th>
                 <td>{{ task.title }}</td>
                 <td>{{ task.created_date }}</td>
-                {% if task.done == '1' %}
+                {% if task.done == 1 %}
                 <td>Выполнено</td>
                 {% else %}
                 <td>Не выполнено</td>
