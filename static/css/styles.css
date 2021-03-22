@@ -1,6 +1,6 @@
 * {
     margin: 0;
-    font-family:Verdana, Geneva, Tahoma, sans-serif;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
 a {
@@ -112,15 +112,29 @@ input:focus {
 /* Main-content */
 
 main {
-    float: left;
     padding: 10px 30px;
-    margin: 0 13%;
+    margin: 20px 300px;
 }
 
-.main_header {
+.cards {
+    float: left;
     display: flex;
+    flex-wrap: wrap;
+    width: 1100px;
 }
 
-#new_task {
-    float: right;
+.card {
+    margin: 5px;
+}
+
+#cards {
+    margin: 0 auto;
+}
+
+#buttons_container {
+    max-width: 600px;
+}
+
+.btn-group {
+    margin: 10px 0;
 }
