@@ -1,8 +1,13 @@
 {% extends "base.html" %} 
 {% block content %}
 <main>
+    <p>{{ current_user.name }}</p>
     <p>With us since {{ current_user.created_date.strftime("%Y-%m-%d") }}</p>
-    <p>Completed Tasks: {{ tasks|length }}</p>
-    
+    <p>{{ completed }} completed tasks</p>
+
+    <h1>Weekly Activity</h1>
+    {% for key, val in tasks.items() %}
+        <h2>{{ key }} - {{ val|length }}</h2>
+    {% endfor %}
 </main>
 {% endblock content %}

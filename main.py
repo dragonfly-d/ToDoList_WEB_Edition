@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect,  url_for, request, abort, jsonify, make_response, Markup
 from flask_login import LoginManager, current_user, login_user, logout_user, login_required
-from datetime import datetime
+from datetime import datetime, timedelta
 from data import db_session
 from data.users import User
 from data.tasks import Tasks
@@ -124,13 +124,21 @@ def upcoming_tasks():
 @login_required
 def dashboard():
     db_sess = db_session.create_session()
-    # Запрашиваем все выполненные этим пользователем задачи
-    tasks = db_sess.query(Tasks).filter(Tasks.user_id == current_user.id, Tasks.done == 1).all()
+
+    last_week_date = datetime.today() - timedelta(7) # Находим дату недельной давности 
+    # Запрашиваем все выполненные этим пользователем задачи за последнюю неделю
+    tasks = db_sess.query(Tasks).filter(Tasks.user_id == current_user.id, Tasks.done == 1, 
+                                        last_week_date < Tasks.scheduled_date, Tasks.scheduled_date < datetime.now()).all()
     
-    for key, group in groupby(sorted(tasks, key=lambda x: x.scheduled_date.strftime("%A")), key=lambda x: x.scheduled_date):
-        print(key, group)
-        
-    return render_template('dashboard.html', title="Upcoming Tasks", tasks=tasks)
+    data = {"Monday": "", "Tuesday": "", "Wednesday": "", "Thursday": "", "Friday": "", "Saturday": "", "Sunday": ""}
+    for key, group in groupby(sorted(tasks, key=lambda x: x.scheduled_date), key=lambda x: x.scheduled_date.strftime("%A")):
+        data[key] = [val for val in group]
+
+    # Запрашиваем завершенные задачи за все время
+    tasks = db_sess.query(Tasks).filter(Tasks.user_id == current_user.id, Tasks.done == 1).all()
+    completed = len(tasks)
+
+    return render_template('dashboard.html', title="Upcoming Tasks", tasks=data, completed=completed)
 
 @app.route('/add_tasks',  methods=['GET', 'POST'])
 @login_required
