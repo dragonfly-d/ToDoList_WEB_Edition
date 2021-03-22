@@ -1,19 +1,90 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
-    <link rel="stylesheet" href="static/css/style.css">
-    <title>{{ title }}</title>
-</head>
-<body>
-    {% if current_user.is_authenticated %}
-        <p>
-            <a class="navbar-brand" href="/logout">{{ current_user.name }}</a>
-        </p>
-    {% endif %}
-    {% block content %}
-    {% endblock %}
-</body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl"
+            crossorigin="anonymous"
+        />
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+        <title>{{ title }}</title>
+    </head>
+    <body>
+        <header class="header">
+            <div class="header_nav">
+                <a class="header_logo" href="">ToDoList!</a>
+            </div>
+
+            <input
+                type="search"
+                name="finder"
+                id="finder"
+                class="finder"
+                placeholder="Find task"
+            />
+
+            {% if current_user.is_authenticated %}
+                <div class="header_nav">
+                    <a class="username">{{ current_user.name }}</a>
+                </div>
+            {% endif %}
+        </header>
+
+        <div class="side_bar">
+            <div class="sidebar_section">
+                <div class="sidebar_item">
+                    <img
+                        src="static/img/icons/Main_page.png"
+                        alt=""
+                        class="icon"
+                    />
+                    <a href="/tasks/today">Main page</a>
+                </div>
+                <div class="sidebar_item">
+                    <img
+                        src="static/img/icons/Statistics.png"
+                        alt=""
+                        class="icon"
+                    />
+                    <a href="/Statistics">Statistics</a>
+                </div>
+                <div class="sidebar_item">
+                    <img
+                        src="static/img/icons/Projects.png"
+                        alt=""
+                        class="icon"
+                    />
+                    <a href="/Projects">Projects</a>
+                </div>
+            </div>
+
+            <div class="sidebar_section">
+                <div class="sidebar_item">
+                    <img
+                        src="static/img/icons/Settings.png"
+                        alt=""
+                        class="icon"
+                    />
+                    <a href="/Settings">Settings</a>
+                </div>
+                <div class="sidebar_item">
+                    <img
+                        src="static/img/icons/Logout.png"
+                        alt=""
+                        class="icon"
+                    />
+                    <a href="/logout">Logout</a>
+                </div>
+            </div>
+        </div>
+        {% block content %} {% endblock %}
+    </body>
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0"
+        crossorigin="anonymous">
+    </script>
 </html>

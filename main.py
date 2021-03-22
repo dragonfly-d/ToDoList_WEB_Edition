@@ -7,12 +7,12 @@ from data.tasks import Tasks
 from forms.tasks import TasksForm
 from forms.login import LoginForm
 from forms.register import RegisterForm
-import pandas
 from itertools import groupby
 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -28,6 +28,10 @@ def load_user(user_id):
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
+
+@app.errorhandler(401)
+def page_not_found(e):
+    return render_template('401.html'), 401
 
 def main():
     db_session.global_init("db/TDLDataBase.db")
@@ -99,7 +103,7 @@ def tasks():
     tasks = db_sess.query(Tasks).filter(Tasks.user_id == current_user.id, Tasks.scheduled_date == today).all()
     tasks = sorted(tasks, key=lambda x: x.priority) # Сортируем задачи по приоритетности
 
-    return render_template("index.html", title="Today's Tasks", tasks=tasks)
+    return render_template('main.html', title="Today's Tasks", tasks=tasks)
 
 @app.route("/tasks/upcoming", methods=["GET"])
 @login_required
@@ -113,7 +117,8 @@ def upcoming_tasks():
     for key, group in groupby(sorted(tasks, key=lambda x: x.scheduled_date), key=lambda x: x.scheduled_date):
         data[key] = sorted([thing for thing in group], key=lambda x: x.priority) # Сортируем задачи по приоритетности
 
-    return render_template("upcoming_tasks.html", title="Upcoming Tasks", tasks=data)
+    # Для того, чтобы правильно вывести задачи в таблицу посмотри циклы в templates/upcoming_tasks.html
+    return render_template('main.html', title="Upcoming Tasks", tasks=tasks)
 
 @app.route('/add_tasks',  methods=['GET', 'POST'])
 @login_required
