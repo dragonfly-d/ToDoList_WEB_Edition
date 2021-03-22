@@ -28,7 +28,7 @@
 
             {% if current_user.is_authenticated %}
                 <div class="header_nav">
-                    <a class="username">{{ current_user.name }}</a>
+                    <a href="/dashboard" class="username">{{ current_user.name }}</a>
                 </div>
             {% endif %}
         </header>

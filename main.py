@@ -9,7 +9,6 @@ from forms.login import LoginForm
 from forms.register import RegisterForm
 from itertools import groupby
 
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
@@ -103,7 +102,7 @@ def tasks():
     tasks = db_sess.query(Tasks).filter(Tasks.user_id == current_user.id, Tasks.scheduled_date == today).all()
     tasks = sorted(tasks, key=lambda x: x.priority) # Сортируем задачи по приоритетности
 
-    return render_template('main.html', title="Today's Tasks", tasks=tasks)
+    return render_template("main.html", title="Today's Tasks", tasks=tasks)
 
 @app.route("/tasks/upcoming", methods=["GET"])
 @login_required
@@ -118,7 +117,20 @@ def upcoming_tasks():
         data[key] = sorted([thing for thing in group], key=lambda x: x.priority) # Сортируем задачи по приоритетности
 
     # Для того, чтобы правильно вывести задачи в таблицу посмотри циклы в templates/upcoming_tasks.html
-    return render_template('main.html', title="Upcoming Tasks", tasks=tasks)
+    # Скорее всего придется делать новый template для правильного отображения
+    return render_template('main.html', title="Upcoming Tasks", tasks=tasks) # tasks заменить на data
+
+@app.route("/dashboard", methods=["GET"])
+@login_required
+def dashboard():
+    db_sess = db_session.create_session()
+    # Запрашиваем все выполненные этим пользователем задачи
+    tasks = db_sess.query(Tasks).filter(Tasks.user_id == current_user.id, Tasks.done == 1).all()
+    
+    for key, group in groupby(sorted(tasks, key=lambda x: x.scheduled_date.strftime("%A")), key=lambda x: x.scheduled_date):
+        print(key, group)
+        
+    return render_template('dashboard.html', title="Upcoming Tasks", tasks=tasks)
 
 @app.route('/add_tasks',  methods=['GET', 'POST'])
 @login_required

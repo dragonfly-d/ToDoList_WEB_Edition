@@ -1,0 +1,8 @@
+{% extends "base.html" %} 
+{% block content %}
+<main>
+    <p>With us since {{ current_user.created_date.strftime("%Y-%m-%d") }}</p>
+    <p>Completed Tasks: {{ tasks|length }}</p>
+    
+</main>
+{% endblock content %}
