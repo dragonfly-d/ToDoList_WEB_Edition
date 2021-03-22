@@ -23,11 +23,11 @@ def load_user(user_id):
     db_sess = db_session.create_session()
     return db_sess.query(User).get(user_id)
 
-# Обработчик ошибки 404
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
 
+# Обработчики ошибок
 @app.errorhandler(401)
 def page_not_found(e):
     return render_template('401.html'), 401
@@ -102,7 +102,7 @@ def tasks():
     tasks = db_sess.query(Tasks).filter(Tasks.user_id == current_user.id, Tasks.scheduled_date == today).all()
     tasks = sorted(tasks, key=lambda x: x.priority) # Сортируем задачи по приоритетности
 
-    return render_template("main.html", title="Today's Tasks", tasks=tasks)
+    return render_template("index.html", title="Today's Tasks", tasks=tasks)
 
 @app.route("/tasks/upcoming", methods=["GET"])
 @login_required
@@ -118,7 +118,7 @@ def upcoming_tasks():
 
     # Для того, чтобы правильно вывести задачи в таблицу посмотри циклы в templates/upcoming_tasks.html
     # Скорее всего придется делать новый template для правильного отображения
-    return render_template('main.html', title="Upcoming Tasks", tasks=tasks) # tasks заменить на data
+    return render_template('index.html', title="Upcoming Tasks", tasks=tasks) # tasks заменить на data
 
 @app.route("/dashboard", methods=["GET"])
 @login_required

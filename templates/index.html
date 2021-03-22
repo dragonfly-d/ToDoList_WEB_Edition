@@ -1,17 +1,43 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% block content %}
+<main>
+    <div class="container" id="cards">
+        <div class="card_header">
+            <h1>{{ list_name }}</h1>
+            <div class="btn-group">
+                <a
+                    href="/tasks/today"
+                    class="btn btn-secondary"
+                    aria-current="page"
+                    >Today's tasks</a
+                >
+                <a href="/tasks/upcoming" class="btn btn-secondary">All tasks</a>
+            </div>
+            <a href="/add_tasks" class="btn btn-primary" id="new_task">New task</a>
+        </div>
+        <div class="cards">
+            {% for item in tasks %}
+            <div class="card text-center" style="width: 18rem">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        {{ item.title }} - {% if item.done %} Done! {% else %}
+                        In progress {% endif %}
+                    </h5>
+                    <p class="card-text">Priority: {{ item.priority }}</p>
+                    <div>
+                        <a href="/tasks/{{ item.id }}" class="btn btn-info"
+                            >Edit</a
+                        >
+                        <a
+                            href="/tasks_delete/{{ item.id }}"
+                            class="btn btn-danger"
+                            >Delete</a
+                        >
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</main>
 
-{% block content %}
-<h1 style="text-align: center;">Today's Tasks</h1>
-<a href="/add_tasks" class="btn btn-primary">Add Task</a>
-<a href="/tasks/upcoming" class="btn btn-primary">Upcoming Tasks</a>
-{% for item in tasks %}
-    <div style="margin: 10px;">
-        <h2>{{ item.title }} - {% if item.done %} Done! {% else %} In progress {% endif %}</h2>
-        <h4>Task Priority:</br> {{ item.priority }}</h4>
-    </div>
-    <div>
-        <a href="/tasks/{{ item.id }}" class="btn btn-warning">Edit Task</a>
-        <a href="/tasks_delete/{{ item.id }}" class="btn btn-danger">Delete Task</a>
-    </div>
-{% endfor %}
-{% endblock %}
+{% endblock content %}
