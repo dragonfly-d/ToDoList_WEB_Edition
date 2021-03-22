@@ -8,6 +8,8 @@ from forms.tasks import TasksForm
 from forms.login import LoginForm
 from forms.register import RegisterForm
 from itertools import groupby
+from helpers import weekdays
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -40,12 +42,11 @@ def main():
 Надо будет добавить главную страницу, на которой пользователю будет предложено авторизоваться
 Или сделать navbar, на котором будет отображаться статус авторизации
 '''
-
 @app.route('/')
 def index():
     if current_user.is_authenticated:
         return redirect("/tasks/today")
-    return render_template("main.html", title="Welcome!")
+    return render_template("index.html", title="Welcome!")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -128,10 +129,12 @@ def dashboard():
     last_week_date = datetime.today() - timedelta(7) # Находим дату недельной давности 
     # Запрашиваем все выполненные этим пользователем задачи за последнюю неделю
     tasks = db_sess.query(Tasks).filter(Tasks.user_id == current_user.id, Tasks.done == 1, 
-                                        last_week_date < Tasks.scheduled_date, Tasks.scheduled_date < datetime.now()).all()
+                                        last_week_date < Tasks.scheduled_date, Tasks.scheduled_date <= datetime.now()).all()
     
-    data = {"Monday": "", "Tuesday": "", "Wednesday": "", "Thursday": "", "Friday": "", "Saturday": "", "Sunday": ""}
-    for key, group in groupby(sorted(tasks, key=lambda x: x.scheduled_date), key=lambda x: x.scheduled_date.strftime("%A")):
+    # Заполняем статистику пустыми значениями
+    weekday = weekdays(datetime.now().strftime("%A"))
+    data = {key:"" for key in weekday}
+    for key, group in groupby(reversed(sorted(tasks, key=lambda x: x.scheduled_date)), key=lambda x: x.scheduled_date.strftime("%A")):
         data[key] = [val for val in group]
 
     # Запрашиваем завершенные задачи за все время
