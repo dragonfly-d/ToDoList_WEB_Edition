@@ -15,7 +15,7 @@
     <body>
         <header class="header">
             <div class="header_nav">
-                <a class="header_logo" href="">ToDoList!</a>
+                <a class="header_logo" href="{{ url_for("index") }}">ToDoList!</a>
             </div>
 
             <input
@@ -28,7 +28,7 @@
 
             {% if current_user.is_authenticated %}
                 <div class="header_nav">
-                    <a href="/dashboard" class="username">{{ current_user.name }}</a>
+                    <a href="{{ url_for("dashboard") }}" class="username">{{ current_user.name }}</a>
                 </div>
             {% endif %}
         </header>
@@ -41,7 +41,7 @@
                         alt=""
                         class="icon"
                     />
-                    <a href="/tasks/today">Main page</a>
+                    <a href="{{ url_for("tasks") }}">Main page</a>
                 </div>
                 <div class="sidebar_item">
                     <img
@@ -49,7 +49,7 @@
                         alt=""
                         class="icon"
                     />
-                    <a href="/statistics">Statistics</a>
+                    <a href="{{ url_for("dashboard") }}">Statistics</a>
                 </div>
                 <div class="sidebar_item">
                     <img
@@ -57,7 +57,7 @@
                         alt=""
                         class="icon"
                     />
-                    <a href="/projects">Projects</a>
+                    <a href="">Projects</a>
                 </div>
             </div>
 
@@ -68,7 +68,7 @@
                         alt=""
                         class="icon"
                     />
-                    <a href="/settings">Settings</a>
+                    <a href="">Settings</a>
                 </div>
                 <div class="sidebar_item">
                     <img
@@ -76,7 +76,7 @@
                         alt=""
                         class="icon"
                     />
-                    <a href="/logout">Logout</a>
+                    <a href="{{ url_for("logout") }}">Logout</a>
                 </div>
             </div>
         </div>

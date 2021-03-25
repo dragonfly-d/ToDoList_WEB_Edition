@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect,  url_for, request, abort, jsonify, make_response, Markup
+from flask import Flask, render_template, redirect, url_for, request, abort, jsonify, session
 from flask_login import LoginManager, current_user, login_user, logout_user, login_required
 from datetime import datetime, timedelta
 from data import db_session
@@ -17,6 +17,7 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 login_manager = LoginManager()
 login_manager.init_app(app)
+login_manager.login_view = "login"
 
 # Инициализируем декоратор авторизации. 
 # Пользователь не сможет совершать действия, помеченные декоратором, если он не авторизован
@@ -27,12 +28,12 @@ def load_user(user_id):
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return render_template('404.html'), 404
+    return render_template("404.html"), 404
 
 # Обработчики ошибок
 @app.errorhandler(401)
 def page_not_found(e):
-    return render_template('401.html'), 401
+    return render_template("401.html"), 401
 
 def main():
     db_session.global_init("db/TDLDataBase.db")
@@ -45,7 +46,7 @@ def main():
 @app.route('/')
 def index():
     if current_user.is_authenticated:
-        return redirect("/tasks/today")
+        return redirect(url_for("tasks"))
     return render_template("index.html", title="Welcome!")
 
 @app.route("/login", methods=["GET", "POST"])
@@ -59,8 +60,9 @@ def login():
         # Проверяем если пользователь зарегистрирован в базе данных и пароли совпадают
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
-            return redirect("/tasks/today")
-        return render_template('login.html',
+            next_page = request.args.get("next")
+            return redirect(next_page) if next_page else redirect(url_for("tasks"))
+        return render_template("login.html",
                                message="Incorrect email or password",
                                form=form)
     return render_template('login.html', title='Authorization', form=form)
@@ -77,8 +79,7 @@ def registration():
         db_sess = db_session.create_session()
         # Смотрим если почтовый адрес еще не занят
         if db_sess.query(User).filter(form.email.data == User.email).first():
-            return render_template("register.html", title="Registration", 
-                                    message="The email is already taken. Try to", link='login', form=form)
+            return render_template("register.html", title="Registration", form=form)
 
         user = User()
         user.email = form.email.data
@@ -86,13 +87,13 @@ def registration():
         user.name = form.name.data
         db_sess.add(user)
         db_sess.commit()
-        return redirect("/login")
+        return redirect(url_for("login"))
     return render_template("register.html", title="Registration", form=form)
 
 @app.route("/logout", methods=["GET", "POST"])
 def logout():
     logout_user()
-    return redirect("/")
+    return redirect(url_for("index"))
 
 @app.route("/tasks/today", methods=["GET"])
 @login_required
@@ -103,6 +104,7 @@ def tasks():
     tasks = db_sess.query(Tasks).filter(Tasks.user_id == current_user.id, Tasks.scheduled_date == today).all()
     tasks = sorted(tasks, key=lambda x: x.priority) # Сортируем задачи по приоритетности
 
+    session["url"] = url_for("tasks")
     return render_template("index.html", title="Today's Tasks", tasks=tasks)
 
 @app.route("/tasks/upcoming", methods=["GET"])
@@ -117,6 +119,7 @@ def upcoming_tasks():
     for key, group in groupby(sorted(tasks, key=lambda x: x.scheduled_date), key=lambda x: x.scheduled_date):
         data[key] = sorted([thing for thing in group], key=lambda x: x.priority) # Сортируем задачи по приоритетности
 
+    session["url"] = url_for("upcoming_tasks")
     # Для того, чтобы правильно вывести задачи в таблицу посмотри циклы в templates/upcoming_tasks.html
     # Скорее всего придется делать новый template для правильного отображения
     return render_template('index.html', title="Upcoming Tasks", tasks=tasks) # tasks заменить на data
@@ -157,10 +160,10 @@ def add_tasks():
         tasks.priority = form.priority.data
         tasks.scheduled_date = form.scheduled_date.data
         tasks.done = form.done.data
-        tasks.user_id = current_user.id # Изменить после добавления функционала с пользователями
+        tasks.user_id = current_user.id
         db_sess.add(tasks)
         db_sess.commit()
-        return redirect('/tasks/today')
+        return redirect(session.get("url")) # Перенаправляет на прошлую страницу
     return render_template('add_task.html', title='Adding a task', form=form)
 
 @app.route('/tasks/<int:task_id>',  methods=['GET', 'POST'])
@@ -192,7 +195,7 @@ def edit_tasks(task_id):
             tasks.scheduled_date = form.scheduled_date.data
             tasks.done = form.done.data
             db_sess.commit()
-            return redirect("/tasks/today")
+            return redirect(session.get("url")) # Перенаправляет на прошлую страницу
         else:
             abort(404)
             
@@ -207,7 +210,7 @@ def delete_task(task_id):
     if task:
         db_sess.delete(task)
         db_sess.commit()
-        return redirect("/tasks/today")
+        return redirect(request.referrer) # Перенаправляет на прошлую страницу
     else:
         abort(404)
 
