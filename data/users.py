@@ -1,6 +1,6 @@
 import datetime
-import sqlalchemy
-from sqlalchemy import orm
+from sqlalchemy import Column, String, DateTime, Integer
+from sqlalchemy.orm import relation
 from .db_session import SqlAlchemyBase
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
@@ -9,20 +9,17 @@ from flask_login import UserMixin
 class User(SqlAlchemyBase, UserMixin):
     __tablename__ = 'users'
 
-    id = sqlalchemy.Column(sqlalchemy.Integer,
-                           primary_key=True, autoincrement=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
 
-    name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    name = Column(String, nullable=True)
 
-    email = sqlalchemy.Column(sqlalchemy.String,
-                              index=True, unique=True, nullable=True)
+    email = Column(String, index=True, unique=True, nullable=True)
 
-    hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    hashed_password = Column(String, nullable=True)
 
-    created_date = sqlalchemy.Column(sqlalchemy.DateTime,
-                                     default=datetime.datetime.now)
+    created_date = Column(DateTime, default=datetime.datetime.now)
 
-    tasks = orm.relation("Tasks", back_populates='user')
+    tasks = relation("Tasks", back_populates='user')
 
     def __repr__(self):
         return f'<User> {self.id} {self.name} {self.email}'

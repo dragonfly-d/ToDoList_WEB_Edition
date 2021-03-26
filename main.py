@@ -126,6 +126,7 @@ def upcoming_tasks():
     db_sess = db_session.create_session()
     # Запрашиваем все задачи, добавленный этим пользователем
     tasks = db_sess.query(Tasks).filter(Tasks.user_id == current_user.id).all()
+    tasks = sorted(tasks, key=lambda x: x.priority) # Сортируем задачи по приоритетности
     
     # Сортируем и группируем задачи по дате
     data = {}
