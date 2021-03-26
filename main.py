@@ -95,34 +95,53 @@ def logout():
     logout_user()
     return redirect(url_for("index"))
 
-@app.route("/tasks/today", methods=["GET"])
+@app.route("/tasks/today", methods=["GET", "POST"])
 @login_required
 def tasks():
+    # Сохраняем url страницы
+    session["url"] = url_for("tasks")
+    
     db_sess = db_session.create_session()
-    # Запрашиваем только задачи, созданные этим пользователем и дата которых совпадает с сегодняшним днем
     today = datetime.strptime(f"{datetime.now().date()}", '%Y-%m-%d')
+
+    # Запрашиваем только задачи, созданные этим пользователем и дата которых совпадает с сегодняшним днем
     tasks = db_sess.query(Tasks).filter(Tasks.user_id == current_user.id, Tasks.scheduled_date == today).all()
     tasks = sorted(tasks, key=lambda x: x.priority) # Сортируем задачи по приоритетности
 
-    session["url"] = url_for("tasks")
     return render_template("index.html", title="Today's Tasks", tasks=tasks)
 
-@app.route("/tasks/upcoming", methods=["GET"])
+@app.route("/tasks/upcoming", methods=["GET", "POST"])
 @login_required
 def upcoming_tasks():
+    # Сохраняем url страницы
+    session["url"] = url_for("upcoming_tasks")
+
     db_sess = db_session.create_session()
     # Запрашиваем все задачи, добавленный этим пользователем
     tasks = db_sess.query(Tasks).filter(Tasks.user_id == current_user.id).all()
-    
     # Сортируем и группируем задачи по дате
     data = {}
     for key, group in groupby(sorted(tasks, key=lambda x: x.scheduled_date), key=lambda x: x.scheduled_date):
         data[key] = sorted([thing for thing in group], key=lambda x: x.priority) # Сортируем задачи по приоритетности
 
-    session["url"] = url_for("upcoming_tasks")
     # Для того, чтобы правильно вывести задачи в таблицу посмотри циклы в templates/upcoming_tasks.html
     # Скорее всего придется делать новый template для правильного отображения
-    return render_template('index.html', title="Upcoming Tasks", tasks=tasks) # tasks заменить на data
+    return render_template('index.html', title="Upcoming Tasks", tasks=data) # tasks заменить на data
+
+@app.route("/search_request", methods=["GET", "POST"])
+def search_request():
+    db_sess = db_session.create_session()
+    searchbox = request.form.get("text") # Получаем содержимое строки поиска
+
+    if session["url"] == url_for("tasks"):
+        today = datetime.strptime(f"{datetime.now().date()}", '%Y-%m-%d')
+        # Запрашиваем только задачи, созданные этим пользователем, дата которых совпадает с сегодняшним днем и название которых есть в поисковой строке
+        tasks = db_sess.query(Tasks).filter(Tasks.user_id == current_user.id, Tasks.scheduled_date == today, Tasks.title.like(f"%{searchbox}%")).all()
+        tasks = sorted(tasks, key=lambda x: x.priority) # Сортируем задачи по приоритетности
+    elif session["url"] == url_for("upcoming_tasks"):
+        pass # Добавить поиск при готовности upcoming_tasks template
+
+    return jsonify(list(map(lambda x: [x.id, x.title, x.priority, x.scheduled_date, x.done], tasks)))
 
 @app.route("/dashboard", methods=["GET"])
 @login_required

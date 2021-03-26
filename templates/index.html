@@ -14,30 +14,85 @@
             </div>
             <a href="/add_tasks" class="btn btn-primary" id="new_task">New task</a>
         </div>
-        <div class="cards">
+        <div class="cards" id="tasks">
             {% for item in tasks %}
-            <div class="card text-center" style="width: 18rem">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        {{ item.title }} - {% if item.done %} Done! {% else %}
-                        In progress {% endif %}
-                    </h5>
-                    <p class="card-text">Priority: {{ item.priority }}</p>
-                    <div>
-                        <a href="/tasks/{{ item.id }}" class="btn btn-info"
-                            >Edit</a
-                        >
-                        <a
-                            href="/tasks_delete/{{ item.id }}"
-                            class="btn btn-danger"
-                            >Delete</a
-                        >
+                <div class="card text-center" style="width: 18rem">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            {{ item.title }} - {% if item.done %} Done! {% else %}
+                            In progress {% endif %}
+                        </h5>
+                        <p class="card-text">Priority: {{ item.priority }}</p>
+                        <div>
+                            <a href="/tasks/{{ item.id }}" class="btn btn-info"
+                                >Edit</a
+                            >
+                            <a
+                                href="/tasks_delete/{{ item.id }}"
+                                class="btn btn-danger"
+                                >Delete</a
+                            >
+                        </div>
                     </div>
                 </div>
-            </div>
             {% endfor %}
         </div>
     </div>
 </main>
 
 {% endblock content %}
+{% block script %}
+<script>
+    function createTaskPattern(data) {
+        var pattern = [
+        '<div class="card text-center" style="width: 18rem">',
+            '<div class="card-body">',
+                '<h5 class="card-title">',
+                data[1],
+                '</h5>',
+                '<p class="card-text">Priority:',
+                data[2],
+                '</p>',
+                '<div>',
+                    '<a href="/tasks/',
+                    data[0],
+                    '" class="btn btn-info">Edit</a>',
+                    '<a href="/tasks_delete/',
+                    data[0],
+                    '" class="btn btn-danger">Delete</a>',
+                '</div>',
+            '</div>',
+        '</div>'
+        ];
+
+        return pattern.join('');
+    }
+
+    $(document).ready(function(){
+        $.ajaxSetup ({
+            cache: false
+        });
+
+        $("#finder").on("input", function(e){
+            text = $("#finder").val();
+
+            $.ajax({
+                method: "post",
+                url: "{{ url_for('search_request') }}",
+                data: {text: text},
+                success: function(res) {
+                    var pattern, nodes = $();
+
+                    $.each(res, function(index, value) {
+                        pattern = createTaskPattern(value);
+                        nodes = nodes.add($(pattern));
+
+                    });
+
+                    $('#tasks').html(nodes);
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
